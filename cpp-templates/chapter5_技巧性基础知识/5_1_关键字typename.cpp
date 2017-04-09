@@ -19,6 +19,8 @@ void printVector(T const& t) {
     std::cout << std::endl;
 }
 
+// bs.template
+// .template告诉编译器后面的 < 并不是小于号，而是模板实参列表的起始符号
 template <int N>
 void printBitset(std::bitset<N> const& bs) {
     std::cout << bs.template to_string<char, std::char_traits<char>, std::allocator<char> >();

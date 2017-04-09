@@ -15,3 +15,4 @@ add_executable(4_2 chapter4_非类型模板参数/4_2_非类型的函数模板�
 add_executable(4_3 chapter4_非类型模板参数/4_3_非类型模板参数的限制.cpp)
 
 add_executable(5_1 chapter5_技巧性基础知识/5_1_关键字typename.cpp)
+add_executable(5_2 chapter5_技巧性基础知识/5_2_使用this.cpp)
