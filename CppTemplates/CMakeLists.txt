@@ -20,3 +20,15 @@ add_executable(5_3 chapter5_技巧性基础知识/5_3_成员模板.cpp)
 add_executable(5_4 chapter5_技巧性基础知识/5_4_模板的模板参数.cpp)
 add_executable(5_5 chapter5_技巧性基础知识/5_5_零初始化)
 add_executable(5_6 chapter5_技巧性基础知识/5_6_使用字符串作为函数模板的实参.cpp)
+
+add_executable(6_2_1
+        chapter6_模板实战/6_2_显式实例化/1_显式实例化/myfirst.cpp
+        chapter6_模板实战/6_2_显式实例化/1_显式实例化/main.cpp
+        )
+add_executable(6_2_2_explicit
+        chapter6_模板实战/6_2_显式实例化/2_合包含模型和显式实例化/explicit_main.cpp
+        chapter6_模板实战/6_2_显式实例化/2_合包含模型和显式实例化/explicit_inst.cpp
+        )
+add_executable(6_2_2_inclusion
+        chapter6_模板实战/6_2_显式实例化/2_合包含模型和显式实例化/inclusion_main.cpp
+        )
