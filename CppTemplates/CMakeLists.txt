@@ -26,9 +26,9 @@ add_executable(6_2_1
         chapter6_模板实战/6_2_显式实例化/1_显式实例化/main.cpp
         )
 add_executable(6_2_2_explicit
-        chapter6_模板实战/6_2_显式实例化/2_合包含模型和显式实例化/explicit_main.cpp
-        chapter6_模板实战/6_2_显式实例化/2_合包含模型和显式实例化/explicit_inst.cpp
+        chapter6_模板实战/6_2_显式实例化/2_组合包含模型和显式实例化/explicit_main.cpp
+        chapter6_模板实战/6_2_显式实例化/2_组合包含模型和显式实例化/explicit_inst.cpp
         )
 add_executable(6_2_2_inclusion
-        chapter6_模板实战/6_2_显式实例化/2_合包含模型和显式实例化/inclusion_main.cpp
+        chapter6_模板实战/6_2_显式实例化/2_组合包含模型和显式实例化/inclusion_main.cpp
         )
