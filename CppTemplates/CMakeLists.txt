@@ -14,7 +14,9 @@ add_executable(4_1 chapter4_非类型模板参数/4_1_非类型的类模板参�
 add_executable(4_2 chapter4_非类型模板参数/4_2_非类型的函数模板参数.cpp)
 add_executable(4_3 chapter4_非类型模板参数/4_3_非类型模板参数的限制.cpp)
 
-add_executable(5_1 chapter5_技巧性基础知识/5_1_关键字typename.cpp)
+add_executable(5_1 chapter5_技巧性基础知识/5_1_关键字typename.cpp chapter5_技巧性基础知识/5_6_使用字符串作为函数模板的实参.cpp)
 add_executable(5_2 chapter5_技巧性基础知识/5_2_使用this.cpp)
 add_executable(5_3 chapter5_技巧性基础知识/5_3_成员模板.cpp)
 add_executable(5_4 chapter5_技巧性基础知识/5_4_模板的模板参数.cpp)
+add_executable(5_5 chapter5_技巧性基础知识/5_5_零初始化)
+add_executable(5_6 chapter5_技巧性基础知识/5_6_使用字符串作为函数模板的实参.cpp)
