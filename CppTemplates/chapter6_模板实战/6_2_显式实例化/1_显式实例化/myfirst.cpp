@@ -13,6 +13,7 @@ void printTypeof(T const& t) {
 
 // 显式实例化由关键字template和紧接其后的我们所需要实例化的实体（可以是类、函数、成员函数等组成）
 // 而且该声明是一个已经用实参完全替换参数之后的声明。
+// 显式实例化需要出现在模板定义之后，给定的实参组合在一个程序中最多只能有一个显式实例化体
 template void printTypeof<double>(double const&);
 
 // 基于int显式实例化Myclass<>的构造函数
@@ -25,7 +26,6 @@ template void printTypeof<double>(double const&);
 // 对于已经在前面实例化过的成员，就不能再次对它进行实例化
 // template class Stack<int>;
 
-// 对于不同实体，在一个程序中最多只能有一个显式实例化体
 // 显式实例化的缺点：必须仔细跟踪每个需要实例化的实体
 // 优点：实例化可以在需要的时候才进行。
 // 可以避免包含庞大头文件的开销（模板定义跟声明可以分开，模板定义放源文件中）
