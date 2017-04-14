@@ -13,8 +13,8 @@ import (
 
 type node struct {
 	mid   interface{} // middle point
-	left  *node       // left child
-	right *node       // right child
+	left  *node       // left child, intervals fully left of mid
+	right *node       // right child, intervals fully right of mid
 
 	overlapAsecLeft  []Interval // those intervals that overlap with mid endpoint, sort by their left endpoints ascending
 	overlapDescRight []Interval // those intervals that overlap with mid endpoint, sort by their right endpoints descending
@@ -27,11 +27,15 @@ func newNode(mid interface{}, left, right *node, overlap []Interval) *node {
 		right: right,
 	}
 
-	n.overlapAsecLeft = append(n.overlapAsecLeft, overlap...)
-	sort.Sort(leftAsecSorter(n.overlapAsecLeft))
+	if len(overlap) > 0 {
+		n.overlapAsecLeft = make([]Interval, 0, len(overlap))
+		n.overlapAsecLeft = append(n.overlapAsecLeft, overlap...)
+		sort.Sort(leftAsecSorter(n.overlapAsecLeft))
 
-	n.overlapDescRight = append(n.overlapAsecLeft, overlap...)
-	sort.Sort(rightDescSorter(n.overlapDescRight))
+		n.overlapDescRight = make([]Interval, 0, len(overlap))
+		n.overlapDescRight = append(n.overlapAsecLeft, overlap...)
+		sort.Sort(rightDescSorter(n.overlapDescRight))
+	}
 
 	return n
 }

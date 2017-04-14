@@ -4,6 +4,8 @@
 
 package sintervaltree
 
+import "sort"
+
 type tree struct {
 	root *node
 	cmp  Interval
@@ -37,8 +39,17 @@ func (t *tree) Query(q Interval) []Interval {
 }
 
 func (t *tree) build(intervals []Interval) *node {
-	// TODO:
-	return nil
+	mid, left, right, overlap := t.partition(intervals)
+
+	var leftNode, rightNode *node
+	if len(left) > 0 {
+		leftNode = t.build(left)
+	}
+	if len(right) > 0 {
+		rightNode = t.build(right)
+	}
+
+	return newNode(mid, leftNode, rightNode, overlap)
 }
 
 type endpointSorter struct {
@@ -62,6 +73,25 @@ func (t *tree) partition(inputs []Interval) (mid interface{}, left, right, overl
 	// TODO: remove this check when stable
 	if len(inputs) == 0 {
 		panic("StaticIntervalTree::partition(): empty inputs")
+	}
+
+	endpoints := make([]interface{}, 0, len(inputs)*2)
+	for _, i := range inputs {
+		endpoints = append(endpoints, i.Left())
+		endpoints = append(endpoints, i.Right())
+	}
+	sort.Sort(endpointSorter{cmp: t.cmp, inputs: endpoints})
+
+	mid = endpoints[len(endpoints)/2]
+
+	for _, i := range inputs {
+		if t.cmp.Compare(i.Left(), mid) > 0 { // fully right
+			left = append(left, i)
+		} else if t.cmp.Compare(i.Right(), mid) < 0 { // fully left
+			right = append(right, i)
+		} else { // overlap with mid
+			overlap = append(overlap, i)
+		}
 	}
 
 	return
