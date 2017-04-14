@@ -4,29 +4,23 @@
 
 package sintervaltree
 
-// EndPoint interval's endpoint
-type EndPoint interface {
-	// Compare compare to other endpoint
-	Compare(EndPoint) int
-}
-
 // Interval the interval
 type Interval interface {
 	// Left return interval's left endpoint
-	Left() EndPoint
+	Left() interface{}
 
 	// Right return interval's right endpoint
-	Right() EndPoint
-}
+	Right() interface{}
 
-// Intervals slice of Interval
-type Intervals []Interval
+	// Compare compare two endpoint
+	Compare(interface{}, interface{}) int
+}
 
 // Tree the interface of static interval tree
 type Tree interface {
 	// QueryPoint Find all intervals in the tree which contain the query point
-	QueryPoint(EndPoint) Intervals
+	QueryPoint(interface{}) []Interval
 
 	// Query Find all intervals in the tree which intersect the given interval
-	Query(Interval) Intervals
+	Query(Interval) []Interval
 }
