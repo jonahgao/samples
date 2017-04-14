@@ -4,9 +4,7 @@
 
 package sintervaltree
 
-import (
-	"sort"
-)
+import "sort"
 
 // // Intervals slice of Interval
 // type Intervals []Interval
@@ -33,11 +31,55 @@ func newNode(mid interface{}, left, right *node, overlap []Interval) *node {
 		sort.Sort(leftAsecSorter(n.overlapAsecLeft))
 
 		n.overlapDescRight = make([]Interval, 0, len(overlap))
-		n.overlapDescRight = append(n.overlapAsecLeft, overlap...)
+		n.overlapDescRight = append(n.overlapDescRight, overlap...)
 		sort.Sort(rightDescSorter(n.overlapDescRight))
 	}
 
 	return n
+}
+
+func (n *node) queryOverlap(cmp comparer, x interface{}, left bool) (result []Interval) {
+	if left {
+		for _, i := range n.overlapAsecLeft {
+			if cmp.Compare(i.Left(), x) > 0 {
+				break
+			} else {
+				result = append(result, i)
+			}
+		}
+	} else {
+		for _, i := range n.overlapDescRight {
+			if cmp.Compare(i.Right(), x) < 0 {
+				break
+			} else {
+				result = append(result, i)
+			}
+		}
+	}
+	return
+}
+
+func (n *node) queryPoint(cmp comparer, x interface{}) (result []Interval) {
+	c := cmp.Compare(x, n.mid)
+	if c < 0 { // left
+		if n.left != nil {
+			result = append(result, n.left.queryPoint(cmp, x)...)
+		}
+		result = append(result, n.queryOverlap(cmp, x, true)...)
+	} else if c > 0 { // right
+		result = append(result, n.queryOverlap(cmp, x, false)...)
+		if n.right != nil {
+			result = append(result, n.right.queryPoint(cmp, x)...)
+		}
+	} else { // x is mid
+		result = append(result, n.overlapAsecLeft...)
+	}
+	return
+}
+
+func (n *node) query(q Interval, cmp comparer) []Interval {
+	// TODO:
+	return nil
 }
 
 type leftAsecSorter []Interval

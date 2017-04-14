@@ -6,9 +6,14 @@ package sintervaltree
 
 import "sort"
 
+// endpoint comparer
+type comparer interface {
+	Compare(interface{}, interface{}) int
+}
+
 type tree struct {
 	root *node
-	cmp  Interval
+	cmp  comparer
 }
 
 // NewTree construction new interval tree. complexity: o(nlogn)
@@ -26,8 +31,7 @@ func (t *tree) QueryPoint(x interface{}) []Interval {
 	if t == nil || t.root == nil {
 		return nil
 	}
-	// TODO:
-	return nil
+	return t.root.queryPoint(t.cmp, x)
 }
 
 func (t *tree) Query(q Interval) []Interval {
@@ -53,7 +57,7 @@ func (t *tree) build(intervals []Interval) *node {
 }
 
 type endpointSorter struct {
-	cmp    Interval
+	cmp    comparer
 	inputs []interface{}
 }
 
@@ -86,9 +90,9 @@ func (t *tree) partition(inputs []Interval) (mid interface{}, left, right, overl
 
 	for _, i := range inputs {
 		if t.cmp.Compare(i.Left(), mid) > 0 { // fully right
-			left = append(left, i)
-		} else if t.cmp.Compare(i.Right(), mid) < 0 { // fully left
 			right = append(right, i)
+		} else if t.cmp.Compare(i.Right(), mid) < 0 { // fully left
+			left = append(left, i)
 		} else { // overlap with mid
 			overlap = append(overlap, i)
 		}
