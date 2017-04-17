@@ -12,23 +12,26 @@ import (
 	"time"
 )
 
+type tendpoint int
+
+func (te tendpoint) Compare(other Endpoint) int {
+	return int(te) - int(other.(tendpoint))
+}
+
 type tinterval struct {
 	left, right int
 }
 
-func (t tinterval) Left() interface{} {
-	return t.left
+func (t tinterval) Left() Endpoint {
+	return tendpoint(t.left)
+
 }
 
-func (t tinterval) Right() interface{} {
-	return t.right
+func (t tinterval) Right() Endpoint {
+	return tendpoint(t.right)
 }
 
-func (t tinterval) Compare(lh, rh interface{}) int {
-	return lh.(int) - rh.(int)
-}
-
-const tsize = 100000
+const tsize = 1000
 
 func TestBasic(t *testing.T) {
 	rnd := rand.New(rand.NewSource(time.Now().UnixNano()))
@@ -42,8 +45,8 @@ func TestBasic(t *testing.T) {
 	tree := NewTree(intervals)
 	for i := 0; i < tsize; i++ {
 		x := randEndPoint(rnd)
-		res1 := tree.QueryPoint(x)
-		res2 := queryPointNaive(intervals, x)
+		res1 := tree.QueryPoint(tendpoint(x))
+		res2 := queryPointNaive(intervals, tendpoint(x))
 		if err := compareResults(res1, res2); err != nil {
 			t.Logf("inputs: %v", intervals)
 			t.Logf("query: %v", x)
@@ -68,7 +71,7 @@ func BenchmarkIntervalTree(b *testing.B) {
 
 	for i := 0; i < b.N; i++ {
 		x := randEndPoint(rnd)
-		res1 := tree.QueryPoint(x)
+		res1 := tree.QueryPoint(tendpoint(x))
 		_ = res1
 	}
 }
@@ -86,7 +89,7 @@ func BenchmarkNaive(b *testing.B) {
 
 	for i := 0; i < b.N; i++ {
 		x := randEndPoint(rnd)
-		res := queryPointNaive(intervals, x)
+		res := queryPointNaive(intervals, tendpoint(x))
 		_ = res
 	}
 }
@@ -107,13 +110,11 @@ func randInterval(rnd *rand.Rand) (result tinterval) {
 	return
 }
 
-func queryPointNaive(intervals []Interval, x interface{}) (results []Interval) {
+func queryPointNaive(intervals []Interval, x Endpoint) (results []Interval) {
 	for _, i := range intervals {
-		if i.Compare(x, i.Left()) >= 0 && i.Compare(x, i.Right()) <= 0 {
-			// fmt.Printf("add %v-%v\n", i.Left(), i.Right())
+		if x.Compare(i.Left()) >= 0 && x.Compare(i.Right()) <= 0 {
 			results = append(results, i)
-		} else {
-			// fmt.Printf("skip %v-%v\n", i.Left(), i.Right())
+
 		}
 	}
 	return
@@ -131,11 +132,11 @@ func (rs resultSorter) Len() int {
 }
 
 func (rs resultSorter) Less(i, j int) bool {
-	c := rs[i].Compare(rs[i].Left(), rs[j].Left())
+	c := rs[i].Left().Compare(rs[j].Left())
 	if c != 0 {
 		return c < 0
 	}
-	return rs[i].Compare(rs[i].Right(), rs[j].Right()) < 0
+	return rs[i].Right().Compare(rs[j].Right()) < 0
 }
 
 func (rs resultSorter) Swap(i, j int) {
@@ -149,10 +150,10 @@ func compareResults(a []Interval, b []Interval) error {
 		return fmt.Errorf("length mismatch: %d != %d\n res1=%v\n res2=%v", len(a), len(b), a, b)
 	}
 	for i := 0; i < len(a); i++ {
-		if a[i].Compare(a[i].Left(), b[i].Left()) != 0 {
+		if a[i].Left().Compare(b[i].Left()) != 0 {
 			return fmt.Errorf("left mismatch: %v != %v, at index %d\n res1=%v\n res2=%v", a[i].Left(), b[i].Left(), i, a, b)
 		}
-		if a[i].Compare(a[i].Right(), b[i].Right()) != 0 {
+		if a[i].Right().Compare(b[i].Right()) != 0 {
 			return fmt.Errorf("right mismatch: %v != %v, at index %d\n res1=%v\n res2=%v", a[i].Right(), b[i].Right(), i, a, b)
 		}
 	}

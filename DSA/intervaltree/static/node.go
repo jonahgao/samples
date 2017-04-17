@@ -10,15 +10,15 @@ import "sort"
 // type Intervals []Interval
 
 type node struct {
-	mid   interface{} // middle point
-	left  *node       // left child, intervals fully left of mid
-	right *node       // right child, intervals fully right of mid
+	mid   Endpoint // middle point
+	left  *node    // left child, intervals fully left of mid
+	right *node    // right child, intervals fully right of mid
 
 	overlapAsecLeft  []Interval // those intervals that overlap with mid endpoint, sort by their left endpoints ascending
 	overlapDescRight []Interval // those intervals that overlap with mid endpoint, sort by their right endpoints descending
 }
 
-func newNode(mid interface{}, left, right *node, overlap []Interval) *node {
+func newNode(mid Endpoint, left, right *node, overlap []Interval) *node {
 	n := &node{
 		mid:   mid,
 		left:  left,
@@ -38,10 +38,10 @@ func newNode(mid interface{}, left, right *node, overlap []Interval) *node {
 	return n
 }
 
-func (n *node) queryOverlap(cmp comparer, x interface{}, left bool) (result []Interval) {
+func (n *node) queryOverlap(x Endpoint, left bool) (result []Interval) {
 	if left {
 		for _, i := range n.overlapAsecLeft {
-			if cmp.Compare(i.Left(), x) > 0 {
+			if i.Left().Compare(x) > 0 {
 				break
 			} else {
 				result = append(result, i)
@@ -49,7 +49,7 @@ func (n *node) queryOverlap(cmp comparer, x interface{}, left bool) (result []In
 		}
 	} else {
 		for _, i := range n.overlapDescRight {
-			if cmp.Compare(i.Right(), x) < 0 {
+			if i.Right().Compare(x) < 0 {
 				break
 			} else {
 				result = append(result, i)
@@ -59,17 +59,17 @@ func (n *node) queryOverlap(cmp comparer, x interface{}, left bool) (result []In
 	return
 }
 
-func (n *node) queryPoint(cmp comparer, x interface{}) (result []Interval) {
-	c := cmp.Compare(x, n.mid)
+func (n *node) queryPoint(x Endpoint) (result []Interval) {
+	c := x.Compare(n.mid)
 	if c < 0 { // left
 		if n.left != nil {
-			result = append(result, n.left.queryPoint(cmp, x)...)
+			result = append(result, n.left.queryPoint(x)...)
 		}
-		result = append(result, n.queryOverlap(cmp, x, true)...)
+		result = append(result, n.queryOverlap(x, true)...)
 	} else if c > 0 { // right
-		result = append(result, n.queryOverlap(cmp, x, false)...)
+		result = append(result, n.queryOverlap(x, false)...)
 		if n.right != nil {
-			result = append(result, n.right.queryPoint(cmp, x)...)
+			result = append(result, n.right.queryPoint(x)...)
 		}
 	} else { // x is mid
 		result = append(result, n.overlapAsecLeft...)
@@ -89,7 +89,7 @@ func (ls leftAsecSorter) Len() int {
 }
 
 func (ls leftAsecSorter) Less(i, j int) bool {
-	return ls[i].Compare(ls[i].Left(), ls[j].Left()) < 0
+	return ls[i].Left().Compare(ls[j].Left()) < 0
 }
 
 func (ls leftAsecSorter) Swap(i, j int) {
@@ -103,7 +103,7 @@ func (rs rightDescSorter) Len() int {
 }
 
 func (rs rightDescSorter) Less(i, j int) bool {
-	return rs[i].Compare(rs[i].Right(), rs[j].Right()) > 0
+	return rs[i].Right().Compare(rs[j].Right()) > 0
 }
 
 func (rs rightDescSorter) Swap(i, j int) {

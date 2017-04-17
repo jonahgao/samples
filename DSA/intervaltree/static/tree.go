@@ -13,7 +13,6 @@ type comparer interface {
 
 type tree struct {
 	root *node
-	cmp  comparer
 }
 
 // NewTree construction new interval tree. complexity: o(nlogn)
@@ -22,16 +21,15 @@ func NewTree(intervals []Interval) Tree {
 	if len(intervals) == 0 {
 		return t
 	}
-	t.cmp = intervals[0]
 	t.root = t.build(intervals)
 	return t
 }
 
-func (t *tree) QueryPoint(x interface{}) []Interval {
+func (t *tree) QueryPoint(x Endpoint) []Interval {
 	if t == nil || t.root == nil {
 		return nil
 	}
-	return t.root.queryPoint(t.cmp, x)
+	return t.root.queryPoint(x)
 }
 
 func (t *tree) Query(q Interval) []Interval {
@@ -56,42 +54,39 @@ func (t *tree) build(intervals []Interval) *node {
 	return newNode(mid, leftNode, rightNode, overlap)
 }
 
-type endpointSorter struct {
-	cmp    comparer
-	inputs []interface{}
-}
+type endpointSorter []Endpoint
 
 func (es endpointSorter) Len() int {
-	return len(es.inputs)
+	return len(es)
 }
 
 func (es endpointSorter) Less(i, j int) bool {
-	return es.cmp.Compare(es.inputs[i], es.inputs[j]) < 0
+	return es[i].Compare(es[j]) < 0
 }
 
 func (es endpointSorter) Swap(i, j int) {
-	es.inputs[i], es.inputs[j] = es.inputs[j], es.inputs[i]
+	es[i], es[j] = es[j], es[i]
 }
 
-func (t *tree) partition(inputs []Interval) (mid interface{}, left, right, overlap []Interval) {
+func (t *tree) partition(inputs []Interval) (mid Endpoint, left, right, overlap []Interval) {
 	// TODO: remove this check when stable
 	if len(inputs) == 0 {
 		panic("StaticIntervalTree::partition(): empty inputs")
 	}
 
-	endpoints := make([]interface{}, 0, len(inputs)*2)
+	endpoints := make([]Endpoint, 0, len(inputs)*2)
 	for _, i := range inputs {
 		endpoints = append(endpoints, i.Left())
 		endpoints = append(endpoints, i.Right())
 	}
-	sort.Sort(endpointSorter{cmp: t.cmp, inputs: endpoints})
+	sort.Sort(endpointSorter(endpoints))
 
 	mid = endpoints[len(endpoints)/2]
 
 	for _, i := range inputs {
-		if t.cmp.Compare(i.Left(), mid) > 0 { // fully right
+		if i.Left().Compare(mid) > 0 { // fully right
 			right = append(right, i)
-		} else if t.cmp.Compare(i.Right(), mid) < 0 { // fully left
+		} else if i.Right().Compare(mid) < 0 { // fully left
 			left = append(left, i)
 		} else { // overlap with mid
 			overlap = append(overlap, i)
